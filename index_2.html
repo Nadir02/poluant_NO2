@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <link rel="stylesheet" href="./lib/leaflet-measure.css">
+    <link rel="stylesheet" href="./lib/MarkerCluster.css">
+    <link rel="stylesheet" href="./lib/MarkerCluster.Default.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <title>Dynamique saisonnière des polluants atmosphériques à Abidjan </title>
+    <link rel="icon" href="img/logo_page.png" type="image/png">
+    <link rel="stylesheet" href="style.css"> 
+    <link rel="stylesheet" href="script.js">
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="stylesheet" href="css/leaflet.css">
+    <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+    <link rel="stylesheet" href="css/L.Control.Locate.min.css">
+    <link rel="stylesheet" href="css/qgis2web.css">
+    <link rel="stylesheet" href="css/fontawesome-all.min.css">
+    <link rel="stylesheet" href="css/leaflet-search.css">
+    <link rel="stylesheet" href="css/leaflet-control-geocoder.Geocoder.css">
+    <link rel="stylesheet" href="css/leaflet-measure.css">
+
+
+
+    <style>
+        .h1 {
+            font-size: 0.5; /* Taille de la police */
+    color: #142bfd; /* Couleur du texte */
+    margin: 0; /* Supprime les marges par défaut */
+    padding: 2px; /* Ajoute du padding autour du texte */
+    background-color: #fbfbfb; /* Couleur de fond du titre */
+    border-radius: 4px; /* Bords arrondis */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombre pour donner un effet de profondeur */
+    font-weight: 400 !important;
+    font-family: 'Playball', cursive !important;
+    text-align: center;
+        
+        }
+        #map-container {
+            width: 120vh; /* Largeur égale à 60% de la hauteur de la vue */
+            height: 70vh; /* Hauteur égale à 60% de la hauteur de la vue */
+            position: relative;
+            margin: 0 auto;
+        }
+
+        #map {
+            width: 100%; /* Remplir le conteneur parent */
+            height: 100%; /* Remplir le conteneur parent */
+        }
+        #afficher, #effacer {
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #effacer {
+            background-color: red;
+        }
+    </style>
+</head>
+<body>
+    <script src="js/qgis2web_expressions.js"></script>
+    <script src="js/leaflet.js"></script>
+    <script src="js/L.Control.Layers.Tree.min.js"></script>
+    <script src="js/L.Control.Locate.min.js"></script>
+    <script src="js/multi-style-layer.js"></script>
+    <script src="js/leaflet.rotatedMarker.js"></script>
+    <script src="js/leaflet.pattern.js"></script>
+    <script src="js/leaflet-hash.js"></script>
+    <script src="js/Autolinker.min.js"></script>
+    <script src="js/rbush.min.js"></script>
+    <script src="js/labelgun.min.js"></script>
+    <script src="js/labels.js"></script>
+    <script src="js/leaflet-control-geocoder.Geocoder.js"></script>
+    <script src="js/leaflet-measure.js"></script>
+    <script src="js/leaflet-search.js"></script>
+    <script src="data/Dist_Abidjan_125.js"></script>
+    <script src="data/Sp_Abidjan_126.js"></script>
+    <script src="data/communes_abidjan_127.js"></script>
+    <script src="data/plan_eau_Abidjan_128.js"></script>
+    <script src="data/cheflieusp_129.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+     <!-- Inclure le fichier JavaScript contenant les données GeoJSON -->
+     <script src="data/Dist_Abidjan_125.js"></script> 
+     <h1 class="h1">Repartition spatiale des polluants atmosphériques à Abidjan de 2019 à 2023</h1>
+</div>
+
+
+<div id="legend" class="ol-control">
+    <div class="title">Légende de concentration </div>
+    
+    <div class="pollutant-section">
+      <div class="pollutant-title">CO (ppm)</div>
+      <div class="item">
+        <div class="color-box color-box-faible"></div>
+        <div class="label">&lt; 0.04 -- Faible</div>
+      </div>
+      <div class="item">
+        <div class="color-box color-box-moyenne"></div>
+        <div class="label">0.04 - 0.05 -- Moyenne</div>
+      </div>
+      <div class="item">
+        <div class="color-box color-box-forte"></div>
+        <div class="label">&gt; 0.05 -- Forte</div>
+      </div>
+    </div>
+  
+    <div class="pollutant-section">
+      <div class="pollutant-title">NO₂ (ppm)</div>
+      <div class="item">
+        <div class="color-box color-box-faible"></div>
+        <div class="label">&lt; 5.0E-5-- Faible</div>
+      </div>
+      <div class="item">
+        <div class="color-box color-box-moyenne"></div>
+        <div class="label">5.0E-5 - 7.0E-5-- Moyenne</div>
+      </div>
+      <div class="item">
+        <div class="color-box color-box-forte"></div>
+        <div class="label">&gt; 7.0E-5 -- Forte</div>
+      </div>
+    </div>
+  
+    <div class="pollutant-section">
+      <div class="pollutant-title">O₃ (ppm)</div>
+      <div class="item">
+        <div class="color-box color-box-faible"></div>
+        <div class="label">&lt; 0.118-- Faible</div>
+      </div>
+      <div class="item">
+        <div class="color-box color-box-moyenne"></div>
+        <div class="label">0.118 - 0.124-- Moyenne</div>
+      </div>
+      <div class="item">
+        <div class="color-box color-box-forte"></div>
+        <div class="label">&gt; 0.124 -- Forte</div>
+      </div>
+    </div>
+  
+    <div class="pollutant-section">
+      <div class="pollutant-title">SO₂ (ppm)</div>
+      <div class="item">
+        <div class="color-box color-box-faible"></div>
+        <div class="label">&lt; 1.0E-4-- Faible</div>
+      </div>
+      <div class="item">
+        <div class="color-box color-box-moyenne"></div>
+        <div class="label">1.0E-4 - 3.0E-4-- Moyenne</div>
+      </div>
+      <div class="item">
+        <div class="color-box color-box-forte"></div>
+        <div class="label">&gt; 3.0E-4 -- Forte</div>
+      </div>
+    </div>
+  </div>
+
+    <div class="container">
+        <div class="filtres">
+            <h2>Filtres</h2>
+            <label for="polluant">Polluant:</label>
+            <select id="polluant">
+                <option value="CO">CO</option>
+                <option value="NO2">NO2</option>
+                <option value="O3">O3</option>
+                <option value="SO2">SO2</option>
+            </select>
+
+            <label for="annee">Année:</label>
+            <select id="annee">
+                <option value="2019">2019</option>
+                <option value="2020">2020</option>
+                <option value="2021">2021</option>
+                <option value="2022">2022</option>
+                <option value="2023">2023</option>
+            </select>
+
+            <label for="saison">Saison:</label>
+            <select id="saison">
+                <option value="grande_saison_seche">grande_saison_seche</option>
+                <option value="petite_saison_seche">petite_saison_seche</option>
+                <option value="grande_saison_pluvieuse">grande_saison_pluvieuse</option>
+                <option value="petite_saison_pluvieuse">petite_saison_pluvieuse</option>
+            </select>
+
+            <button id="afficher">Afficher</button>
+            <button id="effacer">Effacer</button>
+        </div>
+
+        <div id="map-container">
+            <div id="map"></div>
+        </div>
+       
+        
+    </div>
+    <div id="graph-container" style="display: none;">
+      <canvas id="myChart"></canvas>
+    </div>
+    <table id="data-table">
+      <tr>
+        <th>Polluants</th>
+        <th>Type</th>
+        <th>2019</th>
+        <th>2020</th>
+        <th>2021</th>
+        <th>2022</th>
+        <th>2023</th>
+      </tr>
+      <tr class="selectable" data-pollutant="CO" data-type="GSP">
+        <td>CO</td>
+        <td>GSP</td>
+        <td>0.04154</td>
+        <td>0.04328</td>
+        <td>0.04149</td>
+        <td>0.04028</td>
+        <td>0.03957</td>
+      </tr>
+      <tr class="selectable" data-pollutant="CO" data-type="PSP">
+        <td>CO</td>
+        <td>PSP</td>
+        <td>0.03698</td>
+        <td>0.03981</td>
+        <td>0.03841</td>
+        <td>0.03796</td>
+        <td>0.03837</td>
+      </tr>
+      <tr class="selectable" data-pollutant="CO" data-type="GSS">
+        <td>CO</td>
+        <td>GSS</td>
+        <td>0.05573</td>
+        <td>0.05852</td>
+        <td>0.05574</td>
+        <td>0.05559</td>
+        <td>0.05430</td>
+      </tr>
+      <tr class="selectable" data-pollutant="CO" data-type="PSS">
+        <td>CO</td>
+        <td>PSS</td>
+        <td>0.04166</td>
+        <td>0.04158</td>
+        <td>0.04185</td>
+        <td>0.03796</td>
+        <td>0.04204</td>
+      </tr>
+    
+      <tr class="selectable" data-pollutant="NO2" data-type="GSP">
+        <td>NO2</td>
+        <td>GSP</td>
+        <td>4.89E-05</td>
+        <td>5.08E-05</td>
+        <td>5.46E-05</td>
+        <td>6.06E-05</td>
+        <td>5.81E-05</td>
+      </tr>
+      <tr class="selectable" data-pollutant="NO2" data-type="PSP">
+        <td>NO2</td>
+        <td>PSP</td>
+        <td>4.52E-05</td>
+        <td>5.01E-05</td>
+        <td>6.25E-05</td>
+        <td>5.75E-05</td>
+        <td>5.42E-05</td>
+      </tr>
+      <tr class="selectable" data-pollutant="NO2" data-type="GSS">
+        <td>NO2</td>
+        <td>GSS</td>
+        <td>5.95E-05</td>
+        <td>5.32E-05</td>
+        <td>5.80E-05</td>
+        <td>6.73E-05</td>
+        <td>6.54E-05</td>
+      </tr>
+      <tr class="selectable" data-pollutant="NO2" data-type="PSS">
+        <td>NO2</td>
+        <td>PSS</td>
+        <td>4.36E-05</td>
+        <td>4.82E-05</td>
+        <td>5.38E-05</td>
+        <td>4.95E-05</td>
+        <td>5.09E-05</td>
+      </tr>
+    
+      <tr class="selectable" data-pollutant="O3" data-type="GSP">
+        <td>O3</td>
+        <td>GSP</td>
+        <td>0.12304</td>
+        <td>0.12146</td>
+        <td>0.12298</td>
+        <td>0.12415</td>
+        <td>0.12377</td>
+      </tr>
+      <tr class="selectable" data-pollutant="O3" data-type="PSP">
+        <td>O3</td>
+        <td>PSP</td>
+        <td>0.11845</td>
+        <td>0.12256</td>
+        <td>0.12101</td>
+        <td>0.12662</td>
+        <td>0.12035</td>
+      </tr>
+      <tr class="selectable" data-pollutant="O3" data-type="GSS">
+        <td>O3</td>
+        <td>GSS</td>
+        <td>0.11731</td>
+        <td>0.11466</td>
+        <td>0.11710</td>
+        <td>0.11598</td>
+        <td>0.12114</td>
+      </tr>
+      <tr class="selectable" data-pollutant="O3" data-type="PSS">
+        <td>O3</td>
+        <td>PSS</td>
+        <td>0.12354</td>
+        <td>0.12514</td>
+        <td>0.12519</td>
+        <td>0.12979</td>
+        <td>0.12702</td>
+      </tr>
+    
+      <tr class="selectable" data-pollutant="SO2" data-type="GSP">
+        <td>SO2</td>
+        <td>GSP</td>
+        <td>-2.98E-05</td>
+        <td>-2.42E-05</td>
+        <td>-2.06E-06</td>
+        <td>9.20E-06</td>
+        <td>-1.37E-05</td>
+      </tr>
+      <tr class="selectable" data-pollutant="SO2" data-type="PSP">
+        <td>SO2</td>
+        <td>PSP</td>
+        <td>-2.75E-05</td>
+        <td>-2.21E-05</td>
+        <td>-3.01E-06</td>
+        <td>-1.14E-06</td>
+        <td>-6.48E-06</td>
+      </tr>
+      <tr class="selectable" data-pollutant="SO2" data-type="GSS">
+        <td>SO2</td>
+        <td>GSS</td>
+        <td>-1.55E-05</td>
+        <td>-3.70E-06</td>
+        <td>-1.99E-05</td>
+        <td>2.62E-05</td>
+        <td>2.93E-05</td>
+      </tr>
+      <tr class="selectable" data-pollutant="SO2" data-type="PSS">
+        <td>SO2</td>
+        <td>PSS</td>
+        <td>-4.95E-05</td>
+        <td>3.57E-05</td>
+        <td>-9.97E-06</td>
+        <td>3.24E-06</td>
+        <td>-6.97E-05</td>
+      </tr>
+    </table>
+
+    <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js" integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw==" crossorigin=""></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="./lib/leaflet.browser.print.min.js"></script>
+    <script src="./lib/leaflet-measure.js"></script>
+    <script src="./lib/leaflet.markercluster.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+   
+    <script>
+      var map = L.map('map').setView([5.333, -4.033], 10);
+
+      // Ajout des fonds de carte
+      var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      var TopPlusOpen_Color = L.tileLayer('https://sgx.geodatenzentrum.de/wmts_topplus_open/tile/1.0.0/web/default/WEBMERCATOR/{z}/{y}/{x}.png', {
+          maxZoom: 18,
+          attribution: 'Map data: &copy; <a href="http://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a>'
+      });
+
+      var CartoDB_DarkMatter = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+          subdomains: 'abcd',
+          maxZoom: 20
+      });
+
+      // Ajouter les fonds de carte à la carte
+      var baseMaps = {
+          'OpenStreetMap': osm,
+          'TopPlusOpen_Color': TopPlusOpen_Color,
+          'CartoDB_DarkMatter': CartoDB_DarkMatter
+      };
+
+      L.control.layers(baseMaps).addTo(map);
+
+      // Gestion des événements de sélection et de l'affichage des images
+document.getElementById('afficher').addEventListener('click', function () {
+            var polluant = document.getElementById('polluant').value;
+            var annee = document.getElementById('annee').value;
+            var saison = document.getElementById('saison').value;
+
+            // Construire le chemin du fichier image
+            var imagePath = `D:/CURAT M2_2024/Semestre 4/nadir_memoir/Web_Sig/test/data/${polluant}_${annee}_${saison}.png`;
+
+
+          // Définir les limites de l'image (à ajuster selon vos besoins)
+          var imageBounds = [[5.104502930022272,-4.486630368335304],[5.72132765895189,-3.6869374384547316]];;
+
+          // Supprimer l'ancienne couche d'image si elle existe
+          if (map.overlay) {
+              map.removeLayer(map.overlay);
+          }
+
+          // Ajouter la nouvelle image en tant que couche
+          map.overlay = L.imageOverlay(imagePath, imageBounds).addTo(map);
+      });
+
+      // Gestion de l'événement pour effacer la carte
+      document.getElementById('effacer').addEventListener('click', function () {
+          // Supprimer l'ancienne couche d'image si elle existe
+          if (map.overlay) {
+              map.removeLayer(map.overlay);
+          }
+      });
+
+      // Fonction pour retirer les lignes vides du contenu des popups
+      function removeEmptyRowsFromPopupContent(content) {
+          return content.replace(/<tr><td><\/td><\/tr>/g, '');
+      }
+
+      // Fonctions pour les popups et les styles de chaque couche
+      function pop_Dist_Abidjan_125(feature, layer) {
+          var popupContent = '<table>\
+              <tr><th scope="row">SURF</th><td>' + (feature.properties['SURF'] !== null ? feature.properties['SURF'].toLocaleString() : '') + '</td></tr>\
+              <tr><td colspan="2">' + (feature.properties['NOMDEPT'] !== null ? feature.properties['NOMDEPT'].toLocaleString() : '') + '</td></tr>\
+              <tr><td colspan="2">' + (feature.properties['NOMREG'] !== null ? feature.properties['NOMREG'].toLocaleString() : '') + '</td></tr>\
+              <tr><td colspan="2">' + (feature.properties['DIST_AUTO'] !== null ? feature.properties['DIST_AUTO'].toLocaleString() : '') + '</td></tr>\
+              <tr><td colspan="2">' + (feature.properties['CODE_INS'] !== null ? feature.properties['CODE_INS'].toLocaleString() : '') + '</td></tr>\
+          </table>';
+          layer.bindPopup(popupContent, { maxHeight: 400 });
+          var popup = layer.getPopup();
+          var content = popup.getContent();
+          var updatedContent = removeEmptyRowsFromPopupContent(content);
+          popup.setContent(updatedContent);
+      }
+
+      function style_Dist_Abidjan_125_0() {
+          return {
+              pane: 'pane_Dist_Abidjan_125',
+              opacity: 1,
+              color: 'rgba(215,25,28,1.0)',
+              dashArray: '',
+              lineCap: 'butt',
+              lineJoin: 'miter',
+              weight: 2.0,
+              fill: true,
+              fillOpacity: 1,
+              fillColor: 'rgba(190,178,151,0.0)',
+              interactive: true,
+          };
+      }
+
+      map.createPane('pane_Dist_Abidjan_125');
+      map.getPane('pane_Dist_Abidjan_125').style.zIndex = 525;
+      map.getPane('pane_Dist_Abidjan_125').style['mix-blend-mode'] = 'normal';
+
+      var layer_Dist_Abidjan_125 = new L.geoJson(json_Dist_Abidjan_125, {
+          attribution: '',
+          interactive: true,
+          dataVar: 'json_Dist_Abidjan_125',
+          layerName: 'layer_Dist_Abidjan_125',
+          pane: 'pane_Dist_Abidjan_125',
+          onEachFeature: pop_Dist_Abidjan_125,
+          style: style_Dist_Abidjan_125_0,
+      });
+
+      function pop_communes_abidjan_127(feature, layer) {
+          var popupContent = '<table>\
+              <tr><td colspan="2">' + (feature.properties['ID'] !== null ? feature.properties['ID'].toLocaleString() : '') + '</td></tr>\
+              <tr><th scope="row">NOM</th><td>' + (feature.properties['NOM'] !== null ? feature.properties['NOM'].toLocaleString() : '') + '</td></tr>\
+              <tr><td colspan="2">' + (feature.properties['CODE_INS'] !== null ? feature.properties['CODE_INS'].toLocaleString() : '') + '</td></tr>\
+          </table>';
+          layer.bindPopup(popupContent, { maxHeight: 400 });
+          var popup = layer.getPopup();
+          var content = popup.getContent();
+          var updatedContent = removeEmptyRowsFromPopupContent(content);
+          popup.setContent(updatedContent);
+      }
+
+      function style_communes_abidjan_127_0() {
+          return {
+              pane: 'pane_communes_abidjan_127',
+              opacity: 1,
+              color: 'rgba(35,35,35,1.0)',
+              dashArray: '',
+              lineCap: 'butt',
+              lineJoin: 'miter',
+              weight: 2.0,
+              fill: true,
+              fillOpacity: 1,
+              fillColor: 'rgba(255,255,204,0.0)',
+              interactive: true,
+          };
+      }
+
+      map.createPane('pane_communes_abidjan_127');
+      map.getPane('pane_communes_abidjan_127').style.zIndex = 526;
+      map.getPane('pane_communes_abidjan_127').style['mix-blend-mode'] = 'normal';
+
+      var layer_communes_abidjan_127 = new L.geoJson(json_communes_abidjan_127, {
+          attribution: '',
+          interactive: true,
+          dataVar: 'json_communes_abidjan_127',
+          layerName: 'layer_communes_abidjan_127',
+          pane: 'pane_communes_abidjan_127',
+          onEachFeature: pop_communes_abidjan_127,
+          style: style_communes_abidjan_127_0,
+      });
+
+      function pop_Sp_Abidjan_126(feature, layer) {
+          var popupContent = '<table>\
+              <tr><th scope="row">NOM</th><td>' + (feature.properties['NOM'] !== null ? feature.properties['NOM'].toLocaleString() : '') + '</td></tr>\
+              <tr><td colspan="2">' + (feature.properties['NOMDEPT'] !== null ? feature.properties['NOMDEPT'].toLocaleString() : '') + '</td></tr>\
+              <tr><td colspan="2">' + (feature.properties['NOMREG'] !== null ? feature.properties['NOMREG'].toLocaleString() : '') + '</td></tr>\
+              <tr><td colspan="2">' + (feature.properties['NOMDIST'] !== null ? feature.properties['NOMDIST'].toLocaleString() : '') + '</td></tr>\
+              <tr><td colspan="2">' + (feature.properties['CODE_INS'] !== null ? feature.properties['CODE_INS'].toLocaleString() : '') + '</td></tr>\
+          </table>';
+          layer.bindPopup(popupContent, { maxHeight: 400 });
+          var popup = layer.getPopup();
+          var content = popup.getContent();
+          var updatedContent = removeEmptyRowsFromPopupContent(content);
+          popup.setContent(updatedContent);
+      }
+
+      function style_Sp_Abidjan_126_0() {
+          return {
+              pane: 'pane_Sp_Abidjan_126',
+              opacity: 1,
+              color: 'rgba(35,35,35,1.0)',
+              dashArray: '',
+              lineCap: 'butt',
+              lineJoin: 'miter',
+              weight: 2.0,
+              fill: true,
+              fillOpacity: 1,
+              fillColor: 'rgba(229,182,54,0.0)',
+              interactive: true,
+          };
+      }
+
+      map.createPane('pane_Sp_Abidjan_126');
+      map.getPane('pane_Sp_Abidjan_126').style.zIndex = 528;
+      map.getPane('pane_Sp_Abidjan_126').style['mix-blend-mode'] = 'normal';
+
+      var layer_Sp_Abidjan_126 = new L.geoJson(json_Sp_Abidjan_126, {
+          attribution: '',
+          interactive: true,
+          dataVar: 'json_Sp_Abidjan_126',
+          layerName: 'layer_Sp_Abidjan_126',
+          pane: 'pane_Sp_Abidjan_126',
+          onEachFeature: pop_Sp_Abidjan_126,
+          style: style_Sp_Abidjan_126_0,
+      });
+
+      // Ajouter les couches GeoJSON au groupe de couches
+      var overlayMaps = {
+          'Dist_Abidjan_125': layer_Dist_Abidjan_125,
+          'Communes Abidjan': layer_communes_abidjan_127,
+          'Sp_Abidjan': layer_Sp_Abidjan_126
+      };
+
+      // Ajouter le contrôle des couches à la carte
+      L.control.layers(null, overlayMaps).addTo(map);
+
+      // Ajouter les couches GeoJSON à la carte
+      layer_Dist_Abidjan_125.addTo(map);
+      layer_communes_abidjan_127.addTo(map);
+      layer_Sp_Abidjan_126.addTo(map);
+
+      // Ajuster la vue de la carte pour afficher les couches GeoJSON
+      var groupBounds = L.latLngBounds();
+      groupBounds.extend(layer_Dist_Abidjan_125.getBounds());
+      groupBounds.extend(layer_communes_abidjan_127.getBounds());
+      groupBounds.extend(layer_Sp_Abidjan_126.getBounds());
+      map.fitBounds(groupBounds);
+      var json_communes_abidjan_127 = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": { "NOM": "Yopougon" },
+                    "geometry": { "type": "Point", "coordinates": [-4.1071381186415845, 5.323496367468534] , }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "NOM": "Cocody" },
+                    "geometry": { "type": "Point", "coordinates": [ -3.9753819205755807, 5.365869721985681] ,}
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "NOM": "Abobo" },
+                    "geometry": { "type": "Point", "coordinates": [ -4.0382355334374544, 5.4333074321677435] , }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "NOM": "Plateau" },
+                    "geometry": { "type": "Point", "coordinates": [ -4.0227110688908105, 5.323324255809076] ,}
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "NOM": "Adjamé" },
+                    "geometry": { "type": "Point", "coordinates": [ -4.024427022999328, 5.365310338247489] ,}
+                },{
+                    "type": "Feature",
+                    "properties": { "NOM": "Attécoubé" },
+                    "geometry": { "type": "Point", "coordinates": [ -4.041827007184969, 5.335992259090074] ,}
+                },{
+                    "type": "Feature",
+                    "properties": { "NOM": "Marcory" },
+                    "geometry": { "type": "Point", "coordinates": [ -3.984913491377694 , 5.302949204177484],}
+                },{
+                    "type": "Feature",
+                    "properties": { "NOM": "Koumassi" },
+                    "geometry": { "type": "Point", "coordinates": [-3.956937821056238,5.299508573004574],}
+                },{
+                    "type": "Feature",
+                    "properties": { "NOM": "Port-Bouet" },
+                    "geometry": { "type": "Point", "coordinates": [ -3.9443766391083654,5.253204027282379],}
+                },{
+                    "type": "Feature",
+                    "properties": { "NOM": "Gonzagueville" },
+                    "geometry": { "type": "Point", "coordinates": [-3.891348906147278, 5.251242874128042],}
+                },{
+                    "type": "Feature",
+                    "properties": { "NOM": "Vridi" },
+                    "geometry": { "type": "Point", "coordinates": [-4.00147803358775,5.265389433805116 ],}
+                },{
+                    "type": "Feature",
+                    "properties": { "NOM": "Treichville" },
+                    "geometry": { "type": "Point", "coordinates": [-4.006474917553267,5.305256999213524, ],}
+                }
+                // Ajoutez d'autres communes ici
+            ]
+        };
+
+        var json_Sp_Abidjan_126 = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": { "NOM": "Anyama" },
+                    "geometry": { "type": "Point", "coordinates": [-4.051028297765019,5.48760549354154 ] }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "NOM": "Brofodoumé" },
+                    "geometry": { "type": "Point", "coordinates": [-3.9294015244563085,5.514539310522067 ] }
+                },
+                {
+                    "type": "Feature",
+                    "properties": { "NOM": "Bingerville" },
+                    "geometry": { "type": "Point", "coordinates": [-3.877881629516333,5.350437581356679 ] }
+                },{
+                    "type": "Feature",
+                    "properties": { "NOM": "Songon" },
+                    "geometry": { "type": "Point", "coordinates": [-4.255046473358181,5.325331074436428 ] }
+                }
+                // Ajoutez d'autres communes ici
+            ]
+        };
+
+        function addMarkersForCommunes(layer, dataVar) {
+    for (var i = 0; i < dataVar.features.length; i++) {
+        var feature = dataVar.features[i];
+        var coords = feature.geometry.coordinates;
+        var latLng = [coords[1], coords[0]]; // Assurez-vous que l'ordre est [lat, lng]
+        
+        // Utiliser L.circleMarker pour des petits points
+        var circleMarker = L.circleMarker(latLng, {
+            radius: 5, // Taille des points
+            fillColor: "#3388ff", // Couleur de remplissage
+            color: "#3388ff", // Couleur de bordure
+            weight: 1, // Épaisseur de la bordure
+            opacity: 1, // Opacité de la bordure
+            fillOpacity: 0.8 // Opacité de remplissage
+        }).addTo(map);
+        
+        // Afficher le nom avec la tooltip légèrement décalée en haut à droite
+        circleMarker.bindTooltip('<strong>' + feature.properties.NOM + '</strong>', {
+            permanent: true, // Tooltip affiché en permanence
+            direction: 'top', // Position du tooltip
+            offset: L.point(10, -10) // Décalage du tooltip
+        }).openTooltip();
+    }
+}
+
+        addMarkersForCommunes(null, json_communes_abidjan_127);
+        addMarkersForCommunes(null, json_Sp_Abidjan_126);
+  </script>
+        
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const rows = document.querySelectorAll('.selectable');
+          const graphContainer = document.getElementById('graph-container');
+          let chart = null;
+        
+          rows.forEach(row => {
+            row.addEventListener('click', function() {
+              const pollutant = this.getAttribute('data-pollutant');
+              const type = this.getAttribute('data-type');
+              const values = [
+                parseFloat(this.children[2].textContent),
+                parseFloat(this.children[3].textContent),
+                parseFloat(this.children[4].textContent),
+                parseFloat(this.children[5].textContent),
+                parseFloat(this.children[6].textContent)
+              ];
+        
+              graphContainer.style.display = 'block';
+        
+              if (chart) {
+                chart.destroy();
+              }
+        
+              const ctx = document.getElementById('myChart').getContext('2d');
+              chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                  labels: ['2019', '2020', '2021', '2022', '2023'],
+                  datasets: [{
+                    label: `${pollutant} - ${type}`,
+                    data: values,
+                    backgroundColor: [
+                      'rgba(255, 99, 132, 0.7)',
+                      'rgba(54, 162, 235, 0.7)',
+                      'rgba(255, 206, 86, 0.7)',
+                      'rgba(75, 192, 192, 0.7)',
+                      'rgba(153, 102, 255, 0.7)'
+                    ],
+                    borderColor: [
+                      'rgba(255, 99, 132, 1)',
+                      'rgba(54, 162, 235, 1)',
+                      'rgba(255, 206, 86, 1)',
+                      'rgba(75, 192, 192, 1)',
+                      'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1
+                  }]
+                },
+                options: {
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      title: {
+                        display: true,
+                        text: 'Valeur'
+                      }
+                    }
+                  },
+                  plugins: {
+                    title: {
+                      display: true,
+                      text: `Évolution de ${pollutant} - ${type} (2019-2023)`
+                    }
+                  }
+                }
+              });
+            });
+          });
+        });
+        </script>
+        
+</body>
+</html>

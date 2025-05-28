@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page de Contact</title>
+    <style>
+        /* Conteneur principal */
+        .contact-container {
+            display: flex;
+            justify-content: space-between; /* Pour aligner les éléments à gauche et à droite */
+            align-items: flex-start; /* Pour aligner les éléments en haut */
+            gap: 20px; /* Espacement entre les deux sections */
+            margin-top: 20px; /* Espacement par rapport au haut */
+        }
+
+        /* Style pour la section des informations de contact */
+        .contact-info {
+            flex: 1; /* Pour occuper l'espace restant */
+            background-color: #f0f0f0; /* Couleur de fond */
+            padding: 20px; /* Espacement intérieur */
+            border-radius: 10px; /* Coins arrondis */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ombre légère */
+        }
+
+        /* Style pour les éléments d'information de contact */
+        .contact-info p {
+            margin: 0; /* Supprime les marges par défaut */
+            font-size: 20px; /* Taille de police */
+            line-height: 1.6; /* Hauteur de ligne */
+            font-family: Georgia, 'Times New Roman', Times, serif;
+        }
+
+        /* Style pour l'iframe de la carte */
+        .map-container {
+            width: 600px;
+            height: 450px;
+            border: 10px solid #ccc;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Style pour l'iframe elle-même */
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="contact-container">
+        <div class="contact-info">
+            <h4 class="mb-4">Contactez Nous</h4>
+            <div class="d-flex flex-column align-items-start">
+                <p><i class="fa fa-map-marker-alt text-primary me-2"></i> Abidjan, Côte d'Ivoire</p>
+                <p><i class="fa fa-phone-alt text-primary me-2"></i> (+225) 0759793194</p>
+                <p><i class="fas fa-envelope text-primary me-2"></i> levixnadirkoffi@gmail.com</p>
+            </div>
+        </div>
+        <div class="map-container">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3972.485052292233!2d-3.9904886902935957!3d5.34267369461361!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xfc1eb7e276d9473%3A0x97c74821d769749d!2sCentre%20Universitaire%20de%20Recherche%20et%20d&#39;Application%20en%20T%C3%A9l%C3%A9d%C3%A9tection!5e0!3m2!1sfr!2sci!4v1717908055171!5m2!1sfr!2sci" 
+                width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+        </div>
+    </div>
+</body>
+</html>
