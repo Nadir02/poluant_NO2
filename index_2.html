@@ -780,6 +780,43 @@ document.getElementById('afficher').addEventListener('click', function () {
         });
         </script>
 <script src="script.js"></script>
+    <script>
+  (function() {
+    const legend = document.getElementById('legend');
+    let isDragging = false;
+    let startX, startY;
+
+    // Unifier souris + tactile avec pointer events
+    legend.addEventListener('pointerdown', e => {
+      isDragging = true;
+      // empêche le “glissement” de la page sous le doigt
+      e.preventDefault();
+      startX = e.clientX - legend.offsetLeft;
+      startY = e.clientY - legend.offsetTop;
+      legend.setPointerCapture(e.pointerId);
+      legend.style.opacity = 0.8;
+    });
+
+    legend.addEventListener('pointermove', e => {
+      if (!isDragging) return;
+      legend.style.left = (e.clientX - startX) + 'px';
+      legend.style.top  = (e.clientY - startY) + 'px';
+    });
+
+    legend.addEventListener('pointerup', e => {
+      isDragging = false;
+      legend.releasePointerCapture(e.pointerId);
+      legend.style.opacity = 1;
+    });
+
+    // Prévient les pointercancel (ex : alerte système)
+    legend.addEventListener('pointercancel', e => {
+      isDragging = false;
+      legend.releasePointerCapture(e.pointerId);
+      legend.style.opacity = 1;
+    });
+  })();
+</script>
 
 </body>
 </html>
