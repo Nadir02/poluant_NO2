@@ -48,6 +48,7 @@
     background-color: white;
     opacity: 0.95;
     z-index: 1000 !important;
+     cursor: move;
   }
   .leaflet-tooltip {
     background-color: transparent; /* Fond transparent */
